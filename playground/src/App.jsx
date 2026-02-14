@@ -89,6 +89,7 @@ const NAV = [
   { id: 'projectcard', label: 'Project Card', icon: FolderOpen },
   { id: 'slider', label: 'Confirm Slider', icon: ArrowUp },
   { id: 'graphic', label: 'Graphic', icon: ChartBar },
+  { id: 'notfound', label: '404 Page', icon: Warning },
   { id: 'themes', label: 'Themes', icon: Sun },
 ];
 
@@ -697,6 +698,11 @@ function PlaygroundContent() {
             </div>
           </Section>
 
+          {/* ── 404 PAGE ────────────────────────────────── */}
+          <Section id="notfound" title="404 Page" description="Drop-in not-found page. Theme-aware with animated accents and a call-to-action.">
+            <NotFoundDemo />
+          </Section>
+
           {/* ── THEMES ──────────────────────────────────── */}
           <Section id="themes" title="Theme System" description="7 built-in themes with custom theme support via CSS variables.">
             <DemoCard title="Switch Theme">
@@ -852,6 +858,97 @@ function ProjectCardDemo({ name, status = 'active', description, path, totalTask
               <span className="tabular-nums">{agents}</span>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  404 Page demo                                                      */
+/* ------------------------------------------------------------------ */
+function NotFoundDemo() {
+  const [glitch, setGlitch] = useState(false);
+
+  useEffect(() => {
+    const iv = setInterval(() => {
+      setGlitch(true);
+      setTimeout(() => setGlitch(false), 150);
+    }, 3000);
+    return () => clearInterval(iv);
+  }, []);
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden bg-surface border border-border-subtle">
+      {/* Subtle grid pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(var(--color-accent) 1px, transparent 1px), linear-gradient(90deg, var(--color-accent) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+        }}
+      />
+
+      {/* Floating accent orb */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-[0.06] blur-3xl pointer-events-none"
+        style={{ background: 'var(--color-accent)' }}
+      />
+
+      <div className="relative flex flex-col items-center justify-center py-16 px-6 text-center">
+        {/* Large 404 with glitch effect */}
+        <div className="relative select-none mb-4">
+          <p
+            className="text-[100px] font-black leading-none tracking-tighter"
+            style={{
+              color: 'var(--color-accent)',
+              opacity: 0.12,
+              transform: glitch ? 'translateX(3px) skewX(-2deg)' : 'none',
+              transition: glitch ? 'none' : 'transform 100ms ease-out',
+            }}
+          >
+            404
+          </p>
+          {/* Accent scanline overlay */}
+          <div
+            className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none"
+            style={{
+              mixBlendMode: 'screen',
+              opacity: glitch ? 0.5 : 0,
+              transition: glitch ? 'none' : 'opacity 200ms',
+            }}
+          >
+            <p
+              className="text-[100px] font-black leading-none tracking-tighter text-accent"
+              style={{ transform: 'translateX(-4px)' }}
+            >
+              404
+            </p>
+          </div>
+        </div>
+
+        <h1 className="text-lg font-bold text-text-primary">
+          Lost in the void
+        </h1>
+        <p className="text-sm text-text-muted mt-1.5 max-w-xs leading-relaxed">
+          This page slipped through a crack in the matrix. It either never existed or wandered off somewhere.
+        </p>
+
+        <div className="flex items-center gap-3 mt-6">
+          <Button icon={House} variant="primary" size="md" onClick={() => toast('Navigation would go home')}>
+            Back home
+          </Button>
+          <Button variant="ghost" size="md" onClick={() => toast('Navigation would go back')}>
+            Go back
+          </Button>
+        </div>
+
+        {/* Error code badge */}
+        <div className="mt-8 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-danger animate-pulse" />
+          <span className="text-[10px] font-mono text-text-muted/50 uppercase tracking-widest">
+            Error 404 &middot; Not Found
+          </span>
         </div>
       </div>
     </div>
