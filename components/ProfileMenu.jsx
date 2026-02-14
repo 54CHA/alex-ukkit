@@ -55,7 +55,7 @@ export function ProfileMenu({
       {/* Dropdown */}
       {open && (
         <div
-          className="fixed sm:absolute inset-x-2 sm:inset-x-auto sm:right-0 top-auto sm:top-full mt-1.5 sm:w-64 rounded-2xl bg-surface-overlay overflow-hidden z-50"
+          className="absolute left-0 top-full mt-1.5 w-64 max-w-[calc(100vw-2rem)] rounded-2xl bg-surface-overlay overflow-hidden z-50"
           style={{ filter: 'drop-shadow(0 8px 32px rgba(0,0,0,0.4))' }}
         >
           {/* User info header */}
