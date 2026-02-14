@@ -129,6 +129,15 @@ function PlaygroundContent() {
 
   // Track if user clicked a nav item recently -- suppress observer override
   const justClicked = useRef(false);
+  const navRef = useRef(null);
+
+  // Auto-scroll sidebar nav to keep active item visible
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const btn = nav.querySelector(`[data-nav="${activeSection}"]`);
+    if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [activeSection]);
 
   // Scroll spy
   useEffect(() => {
@@ -148,17 +157,49 @@ function PlaygroundContent() {
     return () => observer.disconnect();
   }, []);
 
-  // Scroll to section on click -- let observer catch up
+  // Scroll to section on click -- step the highlight through each tab sequentially
+  const stepping = useRef(false);
   const scrollTo = useCallback((id) => {
     const el = document.getElementById(id);
-    if (el) {
-      justClicked.current = true;
+    if (!el) return;
+
+    justClicked.current = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const fromIdx = NAV.findIndex(n => n.id === activeSection);
+    const toIdx = NAV.findIndex(n => n.id === id);
+
+    // If already there or adjacent, just jump
+    if (fromIdx === toIdx || Math.abs(fromIdx - toIdx) <= 1 || fromIdx < 0) {
       setActiveSection(id);
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Re-enable observer after scroll completes
       setTimeout(() => { justClicked.current = false; }, 800);
+      return;
     }
-  }, []);
+
+    // Step through each intermediate tab
+    if (stepping.current) {
+      // If already stepping, cancel and jump
+      setActiveSection(id);
+      setTimeout(() => { justClicked.current = false; }, 800);
+      return;
+    }
+    stepping.current = true;
+    const dir = toIdx > fromIdx ? 1 : -1;
+    const stepDelay = Math.min(60, 400 / Math.abs(toIdx - fromIdx));
+    let cur = fromIdx;
+
+    function step() {
+      cur += dir;
+      setActiveSection(NAV[cur].id);
+      if (cur !== toIdx) {
+        setTimeout(step, stepDelay);
+      } else {
+        stepping.current = false;
+        setTimeout(() => { justClicked.current = false; }, 600);
+      }
+    }
+    setTimeout(step, stepDelay);
+  }, [activeSection]);
 
   // Set graphite as default theme on first mount
   useEffect(() => {
@@ -177,10 +218,11 @@ function PlaygroundContent() {
           </h1>
           <p className="text-[9px] text-text-muted mt-0.5 font-mono uppercase tracking-widest">Component Playground</p>
         </div>
-        <nav className="flex-1 overflow-y-auto overscroll-contain scrollbar-none px-2 pb-2 space-y-px">
+        <nav ref={navRef} className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-none px-2 pb-2 space-y-px">
           {NAV.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
+              data-nav={id}
               onClick={() => scrollTo(id)}
               className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors text-left ${
                 activeSection === id

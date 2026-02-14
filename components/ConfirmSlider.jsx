@@ -83,9 +83,17 @@ export function ConfirmSlider({
     };
   }, [percent, threshold, onConfirm, updateFromEvent]);
 
-  // Handle dimensions
-  const handleW = 72;
-  const handleH = 44;
+  // Handle dimensions -- smaller on narrow viewports
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 480px)');
+    setIsMobile(mq.matches);
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  const handleW = isMobile ? 56 : 72;
+  const handleH = isMobile ? 38 : 44;
   const padding = 4;
 
   // Compute handle position (px)
@@ -110,7 +118,7 @@ export function ConfirmSlider({
       ref={trackRef}
       onPointerDown={onStart}
       className={clsx(
-        'relative w-full h-[52px] rounded-full overflow-hidden select-none touch-pan-x',
+        'relative w-full h-[46px] sm:h-[52px] rounded-full overflow-hidden select-none touch-pan-x',
         disabled && 'opacity-50 cursor-not-allowed',
         !disabled && 'cursor-grab active:cursor-grabbing',
         className,

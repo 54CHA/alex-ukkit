@@ -14,9 +14,9 @@ const sizes = {
 };
 
 const paddings = {
-  sm: { normal: 'px-3', icon: 'px-2.5' },
-  md: { normal: 'px-4', icon: 'px-3.5' },
-  lg: { normal: 'px-5', icon: 'px-3.5' },
+  sm: { normal: 'px-3', icon: 'pl-2.5 pr-3' },
+  md: { normal: 'px-4', icon: 'pl-3.5 pr-4.5' },
+  lg: { normal: 'px-5', icon: 'pl-3.5 pr-4.5' },
 };
 
 export function Button({
