@@ -425,18 +425,18 @@ function PlaygroundContent() {
           {/* ── STATS ───────────────────────────────────── */}
           <Section id="stats" title="Stats Row" description="Dashboard-style stat blocks with icon separators. Used on project dashboards and global views.">
             <DemoCard title="Project Stats">
-              <div className="grid grid-cols-4 rounded-xl overflow-hidden bg-surface-overlay">
+              <div className="grid grid-cols-3 sm:grid-cols-4 rounded-xl overflow-hidden bg-surface-overlay">
                 {[
                   { icon: ListChecks, value: '128', label: 'Total Tasks' },
                   { icon: Spinner, value: '14', label: 'In Progress' },
                   { icon: ClockCounterClockwise, value: '6', label: 'Pending' },
-                  { icon: UserCircle, value: '3', label: 'Assignees' },
+                  { icon: UserCircle, value: '3', label: 'Assignees', hideMobile: true },
                 ].map((stat, i) => (
-                  <div key={stat.label} className={`flex items-center gap-3 px-4 py-3.5 ${i > 0 ? 'border-l border-border-subtle' : ''}`}>
+                  <div key={stat.label} className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 sm:py-3.5 ${i > 0 ? 'border-l border-border-subtle' : ''} ${stat.hideMobile ? 'hidden sm:flex' : ''}`}>
                     <stat.icon size={18} weight="duotone" className="text-accent shrink-0" />
-                    <div className="flex flex-col">
-                      <span className="text-lg font-bold text-text-primary tabular-nums leading-none">{stat.value}</span>
-                      <span className="text-[10px] text-text-muted mt-0.5">{stat.label}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-base sm:text-lg font-bold text-text-primary tabular-nums leading-none">{stat.value}</span>
+                      <span className="text-[9px] sm:text-[10px] text-text-muted mt-0.5 truncate">{stat.label}</span>
                     </div>
                   </div>
                 ))}
@@ -528,6 +528,7 @@ function PlaygroundContent() {
           {/* ── TABLES ──────────────────────────────────── */}
           <Section id="tables" title="Tables" description="Structured data table with theme-aware styling.">
             <DemoCard>
+              <div className="overflow-x-auto -mx-4 px-4 scrollbar-none">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -553,6 +554,7 @@ function PlaygroundContent() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </DemoCard>
           </Section>
 
@@ -873,21 +875,21 @@ function PlaygroundContent() {
 /* ------------------------------------------------------------------ */
 /*  Project Card demo                                                  */
 /* ------------------------------------------------------------------ */
-function AnimatedFolderMini({ size = 0.3 }) {
+function AnimatedFolderMini({ size = 0.3, open = false }) {
   const accent = 'var(--color-accent)';
   const accentBack = 'color-mix(in srgb, var(--color-accent) 85%, black)';
   return (
     <div className="shrink-0 w-9 h-8 flex items-center justify-center">
       <div style={{ transform: `scale(${size})`, transformOrigin: 'center' }}>
-        <div className="relative transition-all duration-200 ease-in group-hover:-translate-y-1">
+        <div className="relative transition-transform duration-200 ease-in" style={{ transform: open ? 'translateY(-4px)' : 'none' }}>
           <div className="relative w-[100px] h-[80px]" style={{ backgroundColor: accentBack, borderRadius: '0 10px 10px 10px' }}>
             <span className="absolute z-0 bottom-[98%] left-0 w-[30px] h-[10px]" style={{ backgroundColor: accentBack, borderRadius: '5px 5px 0 0' }} />
             {['#e0e0e0', '#efefef', '#ffffff'].map((bg, i) => (
-              <div key={i} className="absolute z-20 bottom-[10%] left-1/2 transition-all duration-300 ease-in-out -translate-x-1/2 translate-y-[10%] group-hover:translate-y-0"
-                style={{ backgroundColor: bg, borderRadius: '10px', width: ['70%', '80%', '90%'][i], height: ['80%', '70%', '60%'][i] }} />
+              <div key={i} className="absolute z-20 bottom-[10%] left-1/2 transition-all duration-300 ease-in-out -translate-x-1/2"
+                style={{ backgroundColor: bg, borderRadius: '10px', width: ['70%', '80%', '90%'][i], height: ['80%', '70%', '60%'][i], transform: `translateX(-50%) translateY(${open ? '0%' : '10%'})` }} />
             ))}
-            <div className="absolute z-30 w-full h-full origin-bottom transition-all duration-300 ease-in-out group-hover:transform-[skew(15deg)_scaleY(0.6)]" style={{ backgroundColor: accent, borderRadius: '5px 10px 10px 10px' }} />
-            <div className="absolute z-30 w-full h-full origin-bottom transition-all duration-300 ease-in-out group-hover:transform-[skew(-15deg)_scaleY(0.6)]" style={{ backgroundColor: accent, borderRadius: '5px 10px 10px 10px' }} />
+            <div className="absolute z-30 w-full h-full origin-bottom transition-all duration-300 ease-in-out" style={{ backgroundColor: accent, borderRadius: '5px 10px 10px 10px', transform: open ? 'skew(15deg) scaleY(0.6)' : 'none' }} />
+            <div className="absolute z-30 w-full h-full origin-bottom transition-all duration-300 ease-in-out" style={{ backgroundColor: accent, borderRadius: '5px 10px 10px 10px', transform: open ? 'skew(-15deg) scaleY(0.6)' : 'none' }} />
           </div>
         </div>
       </div>
@@ -897,12 +899,16 @@ function AnimatedFolderMini({ size = 0.3 }) {
 
 function ProjectCardDemo({ name, status = 'active', description, path, totalTasks = 0, activeTasks = 0, pendingTasks = 0, members = 0, agents = 0 }) {
   const truncPath = path && path.length > 35 ? '...' + path.slice(-32) : path;
+  const [folderOpen, setFolderOpen] = useState(false);
   return (
-    <div className="group relative text-left rounded-2xl bg-linear-to-br from-surface-raised to-surface-raised/90 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer">
+    <div
+      className="relative text-left rounded-2xl bg-linear-to-br from-surface-raised to-surface-raised/90 transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+      onClick={() => setFolderOpen(v => !v)}
+    >
 
       <div className="p-3.5 flex flex-col flex-1">
         <div className="flex items-start gap-2.5">
-          <AnimatedFolderMini />
+          <AnimatedFolderMini open={folderOpen} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-0.5">
               <h3 className="font-semibold truncate text-[15px] text-text-primary group-hover:text-accent transition-colors">{name}</h3>

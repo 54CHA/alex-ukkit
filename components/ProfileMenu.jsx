@@ -55,8 +55,7 @@ export function ProfileMenu({
       {/* Dropdown */}
       {open && (
         <div
-          className="absolute left-0 top-full mt-1.5 w-64 max-w-[calc(100vw-2rem)] rounded-2xl bg-surface-overlay overflow-hidden z-50"
-          style={{ filter: 'drop-shadow(0 8px 32px rgba(0,0,0,0.4))' }}
+          className="absolute left-0 top-full mt-1.5 w-64 max-w-[calc(100vw-2rem)] rounded-2xl bg-surface-overlay overflow-hidden z-50 shadow-xl shadow-black/20 ring-1 ring-border-subtle"
         >
           {/* User info header */}
           <div className="px-4 py-3.5">

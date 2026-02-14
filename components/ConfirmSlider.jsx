@@ -27,61 +27,72 @@ export function ConfirmSlider({
   const [holding, setHolding] = useState(false);
   const sliding = useRef(false);
   const confirmed = useRef(false);
+  const percentRef = useRef(0);
+  const activePointerId = useRef(null);
 
   const isAccent = variant !== 'danger';
 
-  const updateFromEvent = useCallback((e) => {
+  const computePercent = useCallback((clientX) => {
     const el = trackRef.current;
-    if (!el) return;
+    if (!el) return 0;
     const rect = el.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const x = Math.max(rect.left, Math.min(clientX, rect.right));
-    const p = ((x - rect.left) / rect.width) * 100;
-    setPercent(Math.max(0, Math.min(100, p)));
+    return Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
   }, []);
 
-  const onStart = useCallback((e) => {
-    if (disabled || confirmed.current) return;
-    sliding.current = true;
-    setHolding(true);
-    e.target?.setPointerCapture?.(e.pointerId);
-    updateFromEvent(e);
-  }, [disabled, updateFromEvent]);
+  const doEnd = useCallback(() => {
+    if (!sliding.current) return;
+    sliding.current = false;
+    activePointerId.current = null;
 
-  useEffect(() => {
-    const onMove = (e) => {
-      if (!sliding.current) return;
-      updateFromEvent(e);
-    };
-
-    const onEnd = () => {
-      if (!sliding.current) return;
-      sliding.current = false;
-      if (percent >= threshold && !confirmed.current) {
-        // Confirmed -- keep fill visible, snap to 100%
-        confirmed.current = true;
-        setPercent(100);
-        onConfirm?.();
-        // After a beat, fade everything out
-        setTimeout(() => {
-          setHolding(false);
-          confirmed.current = false;
-          setPercent(0);
-        }, 600);
-      } else {
-        // Not confirmed -- release immediately
+    if (percentRef.current >= threshold && !confirmed.current) {
+      confirmed.current = true;
+      percentRef.current = 100;
+      setPercent(100);
+      onConfirm?.();
+      setTimeout(() => {
         setHolding(false);
+        confirmed.current = false;
+        percentRef.current = 0;
         setPercent(0);
-      }
-    };
+      }, 600);
+    } else {
+      setHolding(false);
+      percentRef.current = 0;
+      setPercent(0);
+    }
+  }, [threshold, onConfirm]);
 
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('pointerup', onEnd);
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onEnd);
-    };
-  }, [percent, threshold, onConfirm, updateFromEvent]);
+  const handlePointerDown = useCallback((e) => {
+    if (disabled || confirmed.current || sliding.current) return;
+    sliding.current = true;
+    activePointerId.current = e.pointerId;
+    setHolding(true);
+
+    // Capture pointer to this element so move/up fire on it, not window
+    trackRef.current?.setPointerCapture(e.pointerId);
+
+    const p = computePercent(e.clientX);
+    percentRef.current = p;
+    setPercent(p);
+  }, [disabled, computePercent]);
+
+  const handlePointerMove = useCallback((e) => {
+    if (!sliding.current || e.pointerId !== activePointerId.current) return;
+    const p = computePercent(e.clientX);
+    percentRef.current = p;
+    setPercent(p);
+  }, [computePercent]);
+
+  const handlePointerUp = useCallback((e) => {
+    if (e.pointerId !== activePointerId.current) return;
+    doEnd();
+  }, [doEnd]);
+
+  const handlePointerCancel = useCallback((e) => {
+    if (e.pointerId !== activePointerId.current) return;
+    doEnd();
+  }, [doEnd]);
 
   // Handle dimensions -- smaller on narrow viewports
   const [isMobile, setIsMobile] = useState(false);
@@ -116,9 +127,12 @@ export function ConfirmSlider({
   return (
     <div
       ref={trackRef}
-      onPointerDown={onStart}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
       className={clsx(
-        'relative w-full h-[46px] sm:h-[52px] rounded-full overflow-hidden select-none touch-pan-x',
+        'relative w-full h-[46px] sm:h-[52px] rounded-full overflow-hidden select-none touch-none',
         disabled && 'opacity-50 cursor-not-allowed',
         !disabled && 'cursor-grab active:cursor-grabbing',
         className,

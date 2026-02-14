@@ -74,8 +74,7 @@ export function NotificationPanel({
       {/* Dropdown */}
       {open && (
         <div
-          className="absolute left-0 top-full mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-xl bg-surface-overlay overflow-hidden z-50"
-          style={{ filter: 'drop-shadow(0 8px 32px rgba(0,0,0,0.4))' }}
+          className="absolute left-0 top-full mt-1.5 w-80 max-w-[calc(100vw-2rem)] rounded-xl bg-surface-overlay overflow-hidden z-50 shadow-xl shadow-black/20 ring-1 ring-border-subtle"
         >
           <div className="flex items-center justify-between px-4 py-2.5 bg-surface-raised/50">
             <span className="text-xs font-semibold text-text-primary">Notifications</span>
