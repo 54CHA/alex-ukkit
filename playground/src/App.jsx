@@ -34,6 +34,8 @@ import { ToastProvider } from '@ui-kit/components/Toast.jsx';
 import { Skeleton } from '@ui-kit/components/Skeleton.jsx';
 import { ConfirmSlider } from '@ui-kit/components/ConfirmSlider.jsx';
 import { Graphic } from '@ui-kit/components/Graphic.jsx';
+import { NotificationPanel } from '@ui-kit/components/NotificationPanel.jsx';
+import { ProfileMenu } from '@ui-kit/components/ProfileMenu.jsx';
 import { SubtaskTimeline } from '@ui-kit/composites/SubtaskTimeline.jsx';
 import { ThemeProvider, useTheme, THEMES } from '@ui-kit/themes/ThemeContext.jsx';
 import { useSquircle } from '@ui-kit/hooks/useSquircle.js';
@@ -87,9 +89,10 @@ const NAV = [
   { id: 'skeletons', label: 'Skeletons', icon: House },
   { id: 'subtasks', label: 'Subtasks', icon: ListBullets },
   { id: 'projectcard', label: 'Project Card', icon: FolderOpen },
+  { id: 'notifications', label: 'Notifications', icon: Bell },
+  { id: 'profile', label: 'Profile Menu', icon: UserCircle },
   { id: 'slider', label: 'Confirm Slider', icon: ArrowUp },
   { id: 'graphic', label: 'Graphic', icon: ChartBar },
-  { id: 'notfound', label: '404 Page', icon: Warning },
   { id: 'themes', label: 'Themes', icon: Sun },
 ];
 
@@ -111,6 +114,15 @@ function PlaygroundContent() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [settingsTab, setSettingsTab] = useState('general');
   const [progress, setProgress] = useState(65);
+
+  // Notification demo
+  const [demoNotifs, setDemoNotifs] = useState([
+    { id: 1, type: 'task', title: 'Task updated', detail: 'Auth flow moved to in_progress', time: new Date(Date.now() - 120000).toISOString() },
+    { id: 2, type: 'success', title: 'QA passed', detail: 'All 12 tests passed', time: new Date(Date.now() - 3600000).toISOString() },
+    { id: 3, type: 'warning', title: 'Budget alert', detail: 'GPU budget at 85%', time: new Date(Date.now() - 7200000).toISOString() },
+    { id: 4, type: 'error', title: 'Deploy failed', detail: 'Exit code 1 on build step', time: new Date(Date.now() - 18000000).toISOString() },
+    { id: 5, type: 'agent', title: 'Codex agent started', detail: 'Processing auth-refactor task', time: new Date(Date.now() - 36000000).toISOString() },
+  ]);
 
   // Squircle demo
   const [sqRef, sqStyle] = useSquircle(28);
@@ -246,7 +258,7 @@ function PlaygroundContent() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Button loading>Saving...</Button>
                   <Button disabled>Disabled</Button>
-                  <Button icon={Trash} variant="danger" size="sm">Delete</Button>
+                  <Button icon={Trash} variant="ghost" size="sm" className="text-danger hover:text-danger">Delete</Button>
                 </div>
               </DemoCard>
             </div>
@@ -645,6 +657,41 @@ function PlaygroundContent() {
             </div>
           </Section>
 
+          {/* ── NOTIFICATIONS ───────────────────────────── */}
+          <Section id="notifications" title="Notification Panel" description="Bell trigger with unread badge and dropdown panel. Supports task, success, error, warning, and agent notification types.">
+            <DemoCard title="With Notifications">
+              <div className="flex items-center gap-6">
+                <NotificationPanel
+                  notifications={demoNotifs}
+                  onDismiss={(id) => setDemoNotifs(prev => prev.filter(n => n.id !== id))}
+                  onClearAll={() => setDemoNotifs([])}
+                />
+                <span className="text-[10px] text-text-muted">Click the bell to open</span>
+              </div>
+            </DemoCard>
+            <DemoCard title="Empty State">
+              <div className="flex items-center gap-6">
+                <NotificationPanel notifications={[]} />
+                <span className="text-[10px] text-text-muted">No notifications</span>
+              </div>
+            </DemoCard>
+          </Section>
+
+          {/* ── PROFILE MENU ─────────────────────────────── */}
+          <Section id="profile" title="Profile Menu" description="Account dropdown with avatar, user info, and action links. Accepts user object and click handlers.">
+            <DemoCard title="With Avatar">
+              <div className="flex items-center gap-6">
+                <ProfileMenu
+                  user={{ name: 'Alex K.', email: 'alex@alexbot.dev' }}
+                  onEditProfile={() => toast('Edit profile clicked')}
+                  onSettings={() => toast('Settings clicked')}
+                  onSignOut={() => toast('Sign out clicked')}
+                />
+                <span className="text-[10px] text-text-muted">Click to open</span>
+              </div>
+            </DemoCard>
+          </Section>
+
           {/* ── CONFIRM SLIDER ──────────────────────────── */}
           <Section id="slider" title="Confirm Slider" description="Slide-to-confirm interaction. Drag past 80% to trigger. Fill edge blurs under the knob. Resets on release.">
             <DemoCard title="Accent Variant">
@@ -696,11 +743,6 @@ function PlaygroundContent() {
                 <Graphic data={[3, 7, 5, 11, 9, 14, 12, 16]} height={50} showArea={false} />
               </DemoCard>
             </div>
-          </Section>
-
-          {/* ── 404 PAGE ────────────────────────────────── */}
-          <Section id="notfound" title="404 Page" description="Drop-in not-found page. Theme-aware with animated accents and a call-to-action.">
-            <NotFoundDemo />
           </Section>
 
           {/* ── THEMES ──────────────────────────────────── */}
@@ -865,97 +907,6 @@ function ProjectCardDemo({ name, status = 'active', description, path, totalTask
 }
 
 /* ------------------------------------------------------------------ */
-/*  404 Page demo                                                      */
-/* ------------------------------------------------------------------ */
-function NotFoundDemo() {
-  const [glitch, setGlitch] = useState(false);
-
-  useEffect(() => {
-    const iv = setInterval(() => {
-      setGlitch(true);
-      setTimeout(() => setGlitch(false), 150);
-    }, 3000);
-    return () => clearInterval(iv);
-  }, []);
-
-  return (
-    <div className="relative rounded-2xl overflow-hidden bg-surface border border-border-subtle">
-      {/* Subtle grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(var(--color-accent) 1px, transparent 1px), linear-gradient(90deg, var(--color-accent) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
-        }}
-      />
-
-      {/* Floating accent orb */}
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full opacity-[0.06] blur-3xl pointer-events-none"
-        style={{ background: 'var(--color-accent)' }}
-      />
-
-      <div className="relative flex flex-col items-center justify-center py-16 px-6 text-center">
-        {/* Large 404 with glitch effect */}
-        <div className="relative select-none mb-4">
-          <p
-            className="text-[100px] font-black leading-none tracking-tighter"
-            style={{
-              color: 'var(--color-accent)',
-              opacity: 0.12,
-              transform: glitch ? 'translateX(3px) skewX(-2deg)' : 'none',
-              transition: glitch ? 'none' : 'transform 100ms ease-out',
-            }}
-          >
-            404
-          </p>
-          {/* Accent scanline overlay */}
-          <div
-            className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none"
-            style={{
-              mixBlendMode: 'screen',
-              opacity: glitch ? 0.5 : 0,
-              transition: glitch ? 'none' : 'opacity 200ms',
-            }}
-          >
-            <p
-              className="text-[100px] font-black leading-none tracking-tighter text-accent"
-              style={{ transform: 'translateX(-4px)' }}
-            >
-              404
-            </p>
-          </div>
-        </div>
-
-        <h1 className="text-lg font-bold text-text-primary">
-          Lost in the void
-        </h1>
-        <p className="text-sm text-text-muted mt-1.5 max-w-xs leading-relaxed">
-          This page slipped through a crack in the matrix. It either never existed or wandered off somewhere.
-        </p>
-
-        <div className="flex items-center gap-3 mt-6">
-          <Button icon={House} variant="primary" size="md" onClick={() => toast('Navigation would go home')}>
-            Back home
-          </Button>
-          <Button variant="ghost" size="md" onClick={() => toast('Navigation would go back')}>
-            Go back
-          </Button>
-        </div>
-
-        {/* Error code badge */}
-        <div className="mt-8 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-danger animate-pulse" />
-          <span className="text-[10px] font-mono text-text-muted/50 uppercase tracking-widest">
-            Error 404 &middot; Not Found
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /*  Squircle Card demo                                                 */
 /* ------------------------------------------------------------------ */
 function SquircleCard() {
@@ -981,11 +932,27 @@ function SquircleCard() {
 /* ------------------------------------------------------------------ */
 /*  ROOT                                                               */
 /* ------------------------------------------------------------------ */
+function NotFound() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-surface px-4 text-center">
+      <p className="text-[100px] font-black leading-none tracking-tighter text-accent/10 select-none">404</p>
+      <h1 className="text-lg font-bold text-text-primary mt-2">Page not found</h1>
+      <a
+        href="/"
+        className="mt-6 inline-flex items-center gap-2 px-5 py-2 rounded-full bg-accent text-white text-sm font-medium hover:opacity-90 transition-opacity"
+      >
+        Back to Playground
+      </a>
+    </div>
+  );
+}
+
 export default function App() {
+  const isRoot = window.location.pathname === '/' || window.location.pathname === '/index.html';
   return (
     <ThemeProvider>
       <ToastProvider />
-      <PlaygroundContent />
+      {isRoot ? <PlaygroundContent /> : <NotFound />}
     </ThemeProvider>
   );
 }
