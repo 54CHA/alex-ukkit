@@ -2,10 +2,12 @@ import { clsx } from 'clsx';
 
 export function Table({ children, className }) {
   return (
-    <div className={clsx('overflow-x-auto rounded-2xl border border-border', className)}>
-      <table className="w-full text-sm">
-        {children}
-      </table>
+    <div className={clsx('rounded-2xl border border-border overflow-hidden', className)}>
+      <div className="overflow-x-auto scrollbar-none">
+        <table className="w-full text-sm">
+          {children}
+        </table>
+      </div>
     </div>
   );
 }

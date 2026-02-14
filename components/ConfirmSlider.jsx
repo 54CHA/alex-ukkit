@@ -10,7 +10,7 @@ import { clsx } from 'clsx';
  * @param {string}   label      - Text shown inside the slider track
  * @param {'accent'|'danger'} variant - Color variant (default: accent)
  * @param {boolean}  disabled   - Disable interaction
- * @param {number}   threshold  - Percent to confirm (default 80)
+ * @param {number}   threshold  - Percent to confirm (default 70)
  * @param {Function} onConfirm  - Called when slider reaches threshold
  * @param {string}   className  - Additional classes
  */
@@ -18,7 +18,7 @@ export function ConfirmSlider({
   label = 'Slide to confirm',
   variant = 'accent',
   disabled = false,
-  threshold = 80,
+  threshold = 70,
   onConfirm,
   className,
 }) {
@@ -29,6 +29,11 @@ export function ConfirmSlider({
   const confirmed = useRef(false);
   const percentRef = useRef(0);
   const activePointerId = useRef(null);
+  // Keep stable refs for the callback to avoid stale closures
+  const thresholdRef = useRef(threshold);
+  const onConfirmRef = useRef(onConfirm);
+  thresholdRef.current = threshold;
+  onConfirmRef.current = onConfirm;
 
   const isAccent = variant !== 'danger';
 
@@ -45,23 +50,25 @@ export function ConfirmSlider({
     sliding.current = false;
     activePointerId.current = null;
 
-    if (percentRef.current >= threshold && !confirmed.current) {
+    if (percentRef.current >= thresholdRef.current && !confirmed.current) {
       confirmed.current = true;
       percentRef.current = 100;
       setPercent(100);
-      onConfirm?.();
+      onConfirmRef.current?.();
       setTimeout(() => {
         setHolding(false);
-        confirmed.current = false;
-        percentRef.current = 0;
-        setPercent(0);
-      }, 600);
+        setTimeout(() => {
+          confirmed.current = false;
+          percentRef.current = 0;
+          setPercent(0);
+        }, 150);
+      }, 500);
     } else {
       setHolding(false);
       percentRef.current = 0;
       setPercent(0);
     }
-  }, [threshold, onConfirm]);
+  }, []);
 
   const handlePointerDown = useCallback((e) => {
     if (disabled || confirmed.current || sliding.current) return;
@@ -69,7 +76,6 @@ export function ConfirmSlider({
     activePointerId.current = e.pointerId;
     setHolding(true);
 
-    // Capture pointer to this element so move/up fire on it, not window
     trackRef.current?.setPointerCapture(e.pointerId);
 
     const p = computePercent(e.clientX);
@@ -145,8 +151,8 @@ export function ConfirmSlider({
       <div
         className={clsx('absolute top-0 left-0 bottom-0 pointer-events-none', isAccent ? 'bg-accent' : 'bg-danger')}
         style={{
-          width: !holding ? '0px' : isConfirmed ? '100%' : `${knobCenter}px`,
-          opacity: holding ? 1 : 0,
+          width: isConfirmed ? '100%' : !holding ? '0px' : `${knobCenter}px`,
+          opacity: (holding || isConfirmed) ? 1 : 0,
           transition: isConfirmed
             ? 'width 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 120ms ease-out'
             : holding
@@ -171,10 +177,10 @@ export function ConfirmSlider({
       <div
         className="absolute inset-0 flex items-center justify-center pointer-events-none text-sm font-semibold tracking-wide text-white"
         style={{
-          clipPath: !holding
-            ? 'inset(0 100% 0 0)'
-            : isConfirmed
-              ? 'inset(0 0% 0 0)'
+          clipPath: isConfirmed
+            ? 'inset(0 0% 0 0)'
+            : !holding
+              ? 'inset(0 100% 0 0)'
               : `inset(0 calc(100% - ${knobCenter}px) 0 0)`,
           transition: isConfirmed
             ? 'clip-path 300ms cubic-bezier(0.4, 0, 0.2, 1)'

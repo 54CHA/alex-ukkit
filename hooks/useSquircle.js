@@ -52,7 +52,7 @@ export function generateSquirclePath(w, h, radius, smoothing = 0.6) {
 // When the clip-path is not yet computed (pre-mount) the style object
 // is empty, so the CSS `rounded-*` class acts as a natural fallback.
 
-export function useSquircle(radius = 26, smoothing = 0.6) {
+export function useSquircle(radius = 24, smoothing = 0.6) {
   const [clipPath, setClipPath] = useState('');
   const elRef       = useRef(null);
   const observerRef = useRef(null);

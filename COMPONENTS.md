@@ -1,4 +1,4 @@
-# alexbot UI Kit - Component API Reference
+# SwiftGifts UI Kit - Component API Reference
 
 Complete API documentation for every component in the kit.
 
@@ -573,3 +573,264 @@ Standard Tailwind spacing with `--spacing-sidebar: 240px` for sidebar width.
 | `animate-in slide-in-from-top-2` | Slide down |
 | `skeleton-pulse` | Skeleton shimmer |
 | `animate-spin-once` | Single 360 spin |
+
+---
+
+## SwiftGifts Components
+
+All SwiftGifts-specific components are in `components/swift/`. They follow the same theme-aware patterns but are tailored for the Telegram Mini App ecosystem.
+
+### LineChart
+
+Pure SVG line chart with gradient fill, timeframe selector, and hover tooltip.
+
+```jsx
+import { LineChart } from './components/swift/LineChart';
+
+<LineChart
+  title="Market Cap"
+  timeframes={['1d', '1w', '1m', '3m']}
+  data={{
+    '1d': { labels: ['00:00', '08:00', '16:00', '23:59'], values: [2.1e9, 2.3e9, 2.4e9, 2.6e9] },
+  }}
+  color="var(--color-accent)"
+  height={240}
+/>
+```
+
+**Props**: `title`, `timeframes` (string[]), `data` (`{ [tf]: { labels, values } }`), `color`, `height` (px), `showArea` (bool), `className`
+
+### BarChart
+
+SVG bar chart with timeframe selector.
+
+```jsx
+import { BarChart } from './components/swift/BarChart';
+
+<BarChart
+  title="Volume"
+  timeframes={['1d', '1w', '1m']}
+  data={{ '1d': { labels: [...], values: [...] } }}
+  color="var(--color-accent)"
+  height={200}
+/>
+```
+
+**Props**: `title`, `timeframes`, `data`, `color`, `height`, `className`
+
+### WhaleFlowChart
+
+Scrollable vertical bar chart with opacity encoding volume and hover stats.
+
+```jsx
+import { WhaleFlowChart } from './components/swift/WhaleFlowChart';
+
+<WhaleFlowChart
+  title="Whale Net Flow"
+  timeframes={['1h', '6h', '1d']}
+  data={{
+    '1h': [{ count: 18, volume: 45, label: '0m' }, ...],
+  }}
+/>
+```
+
+**Props**: `title`, `timeframes`, `data` (`{ [tf]: { count, volume, label }[] }`), `className`
+
+### HealthScoreGauge
+
+3/4 arc gauge with red/yellow/green segments.
+
+```jsx
+import { HealthScoreGauge } from './components/swift/HealthScoreGauge';
+
+<HealthScoreGauge value={72} label="Health Score" />
+```
+
+**Props**: `value` (0-100), `label`, `className`
+
+### Heatmap
+
+Treemap-style heatmap with click-to-detail panel below the grid.
+
+```jsx
+import { Heatmap } from './components/swift/Heatmap';
+
+<Heatmap
+  title="Heatmap"
+  timeframes={['12h', '24h', '3d', '7d', '30d']}
+  data={{
+    '24h': [
+      { id: 'ton', name: 'TON', change: 12.5, price: 5.82, volume: '1.2B', mcap: '20B' },
+      ...
+    ],
+  }}
+/>
+```
+
+**Props**: `title`, `timeframes`, `data` (`{ [tf]: { id, name, change, price?, volume?, mcap?, holders? }[] }`), `className`
+
+### GiftCard
+
+Telegram-style gift card with backdrop gradient, paper texture, squircle corners.
+
+```jsx
+import { GiftCard } from './components/swift/GiftCard';
+
+<GiftCard
+  name="Berry Box"
+  image="/swift-assets/img/berry-box.webp"
+  provider="Getgems"
+  priceTon={0.3}
+  priceUsd={1.74}
+  inCart={false}
+  onToggleCart={() => {}}
+/>
+```
+
+**Props**: `name`, `image`, `provider`, `priceTon`, `priceUsd`, `inCart`, `onToggleCart`, `backdrop` (custom gradient), `className`
+
+### ItemCard
+
+Simpler item card variant.
+
+**Props**: `name`, `image`, `provider`, `price`, `currency`, `soldOut`, `inCart`, `onToggleCart`, `className`
+
+### OrderCard
+
+Order summary card with fee breakdown.
+
+**Props**: `items`, `fees`, `total`, `currency`, `onBuy`, `onAddToCart`, `className`
+
+### CurrencyBadge
+
+Small badge showing currency icon + value. Supports TON, USDT, STON, DUST, Web3, DaoLama, BOLT, and gem.
+
+```jsx
+import { CurrencyBadge } from './components/swift/CurrencyBadge';
+
+<CurrencyBadge currency="ton" value="2.5" />
+<CurrencyBadge currency="gem" value="100" />
+<CurrencyBadge currency="ston" value="45" />
+```
+
+**Props**: `currency` (ton/gem/usdt/ston/dust/web3/daolama/bolt), `value`, `className`
+
+### TimeframeControl
+
+Row of timeframe buttons with single-select accent highlight.
+
+```jsx
+import { TimeframeControl } from './components/swift/TimeframeControl';
+
+<TimeframeControl options={['1h', '6h', '1d', '1w']} value="1d" onChange={setTf} />
+```
+
+**Props**: `options` (string[]), `value`, `onChange`
+
+### SegmentedControl
+
+Pill-style segmented tabs.
+
+```jsx
+import { SegmentedControl } from './components/swift/SegmentedControl';
+
+<SegmentedControl
+  options={[
+    { id: 'overview', label: 'Overview' },
+    { id: 'whales', label: 'Whales' },
+  ]}
+  value="overview"
+  onChange={setSegment}
+/>
+```
+
+**Props**: `options` (`{ id, label }[]`), `value`, `onChange`
+
+### FilterDropdown
+
+Dropdown button for filter options.
+
+```jsx
+import { FilterDropdown } from './components/swift/FilterDropdown';
+
+<FilterDropdown
+  options={[
+    { id: 'all', label: 'All' },
+    { id: 'gainers', label: 'Gainers' },
+  ]}
+  value="all"
+  onChange={setFilter}
+/>
+```
+
+**Props**: `options` (`{ id, label }[]`), `value`, `onChange`, `className`
+
+### AchievementCard
+
+Achievement tile with completed/locked states.
+
+**Props**: `icon`, `title`, `subtitle`, `completed`, `pinned`, `onClick`, `className`
+
+### CheckInBonus
+
+7-day check-in grid with gem rewards and claim button.
+
+**Props**: `days` (`{ reward, isAvailable, isClaimed }[]`), `onClaim`, `className`
+
+### ReferralCard
+
+Referral stats card with invite/copy buttons.
+
+**Props**: `earnedTon`, `earnedDiamonds`, `invitedCount`, `badgeLevel`, `badgeProgress`, `onInvite`, `onCopy`, `className`
+
+### StatsTriplet
+
+Three stat blocks in a row.
+
+```jsx
+import { StatsTriplet } from './components/swift/StatsTriplet';
+
+<StatsTriplet
+  items={[
+    { label: 'Earned', value: '12.5 TON' },
+    { label: 'Volume', value: '$1.2K' },
+    { label: 'Orders', value: '48' },
+  ]}
+/>
+```
+
+**Props**: `items` (`{ label, value }[]`), `className`
+
+### BatteryIndicator
+
+Battery icon with 4 states.
+
+```jsx
+import { BatteryIndicator } from './components/swift/BatteryIndicator';
+
+<BatteryIndicator state="full" />
+<BatteryIndicator state="low" />
+```
+
+**Props**: `state` (none/low/half/full), `size`, `className`
+
+### DegenModeCard
+
+Subscription card with crosshair icon.
+
+**Props**: `active`, `expiresAt`, `onPress`, `className`
+
+### SwiftIcons
+
+Inline SVG icons that inherit `currentColor`.
+
+```jsx
+import { TonIcon, GemIcon, PresentIcon, StarIcon, CrownIcon, WalletIcon, BatteryIcon } from './components/swift/SwiftIcons';
+
+<TonIcon size={16} />         // TON blue circle logo
+<GemIcon size={16} />         // Phosphor SketchLogo (gem/crystal shape)
+<PresentIcon size={16} />     // Gift box
+<BatteryIcon state="full" />  // Battery with fill level
+```
+
+**Props** (all): `size`, `className`. `BatteryIcon` also takes `state`.

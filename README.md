@@ -1,6 +1,6 @@
-# alexbot UI Kit
+# SwiftGifts UI Kit
 
-A complete, theme-aware React component library extracted from the alexbot platform. Designed for building dark-mode-first dashboards, task management UIs, and developer tooling interfaces.
+A theme-aware React component library for the SwiftGifts ecosystem. Dark-mode-first, built for Telegram Mini Apps, dashboards, and developer tooling interfaces.
 
 ## Quick Start
 
@@ -25,7 +25,7 @@ npm install @phosphor-icons/react clsx sonner
 
 ### Setup
 
-1. **Add fonts to your HTML `<head>`** (required for proper typography):
+1. **Add fonts to your HTML `<head>`**:
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,41 +36,13 @@ npm install @phosphor-icons/react clsx sonner
 />
 ```
 
-The kit uses **Plus Jakarta Sans** as the primary sans-serif font and **JetBrains Mono** for code/monospace elements.
-
 2. **Import the global styles** in your CSS entry point:
 
 ```css
 @import "./ui-kit/styles/globals.css";
 ```
 
-3. **Icons**: The kit uses [Phosphor Icons](https://phosphoricons.com/) exclusively. Install the React package:
-
-```bash
-npm install @phosphor-icons/react
-```
-
-Common icons used throughout the kit:
-
-```jsx
-import {
-  // Navigation & actions
-  Plus, X, Check, ArrowLeft, ArrowRight, ArrowUp,
-  MagnifyingGlass, PencilSimple, Trash, Copy,
-  // Status & feedback
-  Spinner, CheckCircle, XCircle, Warning, Info,
-  // Content
-  FolderOpen, ClipboardText, Terminal, Tray,
-  BookOpen, SlidersHorizontal, Gauge, Kanban,
-  // People
-  User, UsersThree, UserCircle,
-  // Misc
-  CalendarBlank, Tag, ChatCircle, Megaphone,
-  Compass, Sparkle, Palette, GitBranch,
-} from '@phosphor-icons/react';
-```
-
-4. **Wrap your app with the ThemeProvider**:
+3. **Wrap your app with the ThemeProvider**:
 
 ```jsx
 import { ThemeProvider, ToastProvider } from './ui-kit';
@@ -85,10 +57,12 @@ function App() {
 }
 ```
 
-5. **Use components**:
+4. **Use components**:
 
 ```jsx
-import { Button, Modal, CalendarPicker, Badge } from './ui-kit';
+import { Button, Modal, Badge } from './ui-kit';
+import { LineChart } from './ui-kit/components/swift/LineChart';
+import { GiftCard } from './ui-kit/components/swift/GiftCard';
 ```
 
 ---
@@ -132,9 +106,8 @@ function ThemeSwitcher() {
 ### Custom Themes
 
 ```jsx
-const { saveCustomTheme, deleteCustomTheme, exportTheme, importTheme } = useTheme();
+const { saveCustomTheme, exportTheme, importTheme } = useTheme();
 
-// Create a custom theme
 saveCustomTheme({
   name: 'My Theme',
   description: 'Custom dark theme',
@@ -144,423 +117,146 @@ saveCustomTheme({
     '--color-accent': '#e040fb',
     // ... all CSS variables
   },
-  bgImage: 'https://example.com/bg.jpg', // optional
 });
 
-// Export/import as JSON
 const json = exportTheme('my-theme-id');
 importTheme(json);
 ```
 
 ### CSS Variables Reference
 
-All components use these CSS custom properties, which are set by the ThemeProvider:
-
 ```
-Surfaces:          --color-surface, --color-surface-raised, --color-surface-overlay, --color-surface-hover
-Borders:           --color-border, --color-border-subtle, --color-border-accent
-Text:              --color-text-primary, --color-text-secondary, --color-text-muted
-Accent:            --color-accent, --color-accent-hover, --color-accent-muted, --color-accent-dim
-Status:            --color-success, --color-warning, --color-danger, --color-info, --color-purple
-Typography:        --font-sans, --font-mono
-Spacing:           --spacing-sidebar (240px)
-Radii:             --radius-xs through --radius-4xl
-Background:        --bg-pattern-primary, --bg-pattern-secondary
+Surfaces:    --color-surface, --color-surface-raised, --color-surface-overlay, --color-surface-hover
+Borders:     --color-border, --color-border-subtle, --color-border-accent
+Text:        --color-text-primary, --color-text-secondary, --color-text-muted
+Accent:      --color-accent, --color-accent-hover, --color-accent-muted, --color-accent-dim
+Status:      --color-success, --color-warning, --color-danger, --color-info, --color-purple
+Typography:  --font-sans, --font-mono
+Radii:       --radius-xs through --radius-4xl
 ```
 
 ---
 
-## Components
+## Common Components
 
 ### Primitives
 
-#### Button
-Multi-variant button with icon support.
-
-```jsx
-import { Button } from './ui-kit';
-import { Plus, Trash } from '@phosphor-icons/react';
-
-<Button>Default</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="danger">Danger</Button>
-<Button size="sm" icon={Plus}>Small with Icon</Button>
-<Button size="lg" loading>Loading...</Button>
-<Button disabled>Disabled</Button>
-```
-
-**Props**: `variant` (`primary` | `secondary` | `ghost` | `danger`), `size` (`sm` | `md` | `lg`), `icon`, `loading`, `disabled`, `className`, `onClick`, `type`
-
-#### Input
-Text input with optional icon and label.
-
-```jsx
-import { Input } from './ui-kit';
-import { MagnifyingGlass } from '@phosphor-icons/react';
-
-<Input placeholder="Search..." icon={MagnifyingGlass} />
-<Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-```
-
-**Props**: `label`, `icon`, `className`, and all standard `<input>` props
-
-#### Checkbox
-Animated checkbox with multiple sizes.
-
-```jsx
-import { Checkbox } from './ui-kit';
-
-<Checkbox checked={val} onChange={setVal} />
-<Checkbox size="sm" />
-<Checkbox size="lg" indeterminate />
-<Checkbox disabled />
-```
-
-**Props**: `checked`, `onChange`, `size` (`sm` | `md` | `lg`), `indeterminate`, `disabled`, `label`
-
-#### Badge
-Status indicator badges.
-
-```jsx
-import { Badge } from './ui-kit';
-
-<Badge status="completed">Done</Badge>
-<Badge status="in_progress" dot>Running</Badge>
-<Badge status="failed">Error</Badge>
-<Badge status="pending">Waiting</Badge>
-```
-
-**Props**: `status` (maps to theme colors), `dot` (show status dot), `className`, `children`
-
-#### Tooltip
-Hover tooltip with configurable position.
-
-```jsx
-import { Tooltip } from './ui-kit';
-
-<Tooltip content="More info" position="top">
-  <span>Hover me</span>
-</Tooltip>
-```
-
-**Props**: `content`, `position` (`top` | `bottom` | `left` | `right`), `children`
-
-#### ProgressBar
-Animated progress indicator.
-
-```jsx
-import { ProgressBar } from './ui-kit';
-
-<ProgressBar value={65} />
-<ProgressBar value={100} variant="success" />
-```
-
-**Props**: `value` (0-100), `variant`, `className`
-
-#### Loader
-Loading spinner with optional label.
-
-```jsx
-import { Loader } from './ui-kit';
-
-<Loader />
-<Loader label="Loading data..." />
-```
-
-**Props**: `label`, `className`
-
----
+| Component | Description |
+|-----------|-------------|
+| `Button` | Multi-variant button with icon support, loading state |
+| `Input` | Text input with optional icon and label |
+| `Checkbox` | Animated checkbox with sm/md/lg sizes |
+| `Badge` | Status indicator badges (completed, in_progress, failed, pending) |
+| `Tooltip` | Hover tooltip with configurable position |
+| `ProgressBar` | Animated progress indicator |
+| `Loader` | Loading spinner with optional label |
 
 ### Form Controls
 
-#### CustomSelect
-Portal-based dropdown select that works inside modals.
-
-```jsx
-import { CustomSelect } from './ui-kit';
-
-<CustomSelect
-  value={selected}
-  onChange={setSelected}
-  options={[
-    { value: 'opt1', label: 'Option 1' },
-    { value: 'opt2', label: 'Option 2' },
-  ]}
-  placeholder="Choose..."
-  size="sm"
-/>
-```
-
-**Props**: `value`, `onChange`, `options` (`{ value, label }[]`), `placeholder`, `size` (`sm` | `md`), `className`
-
-#### ColorPicker
-Color picker with presets, grayscale palette, and hue slider.
-
-```jsx
-import { ColorPicker } from './ui-kit';
-
-<ColorPicker value="#ff6b35" onChange={setColor} />
-```
-
-**Props**: `value` (hex string), `onChange` (receives hex string), `className`
-
-#### CalendarPicker
-Full calendar date picker with month/year quick select.
-
-```jsx
-import { CalendarPicker } from './ui-kit';
-
-<CalendarPicker
-  value={selectedDate}
-  onChange={(date) => console.log(date)} // Date object or null
-  label="Due Date"
-  placeholder="Pick a date..."
-  clearable
-/>
-```
-
-**Props**: `value` (Date | ISO string | null), `onChange` (receives Date | null), `label`, `placeholder`, `clearable`, `className`
-
-**Features**:
-- Click month/year header to switch to month picker, then year picker
-- 12-year grid for fast year navigation
-- Today shortcut button
-- Portal-based popup (works inside modals)
-
-#### PathInput
-File path input with autocomplete.
-
-```jsx
-import { PathInput } from './ui-kit';
-
-<PathInput value={path} onChange={setPath} />
-```
-
-**Props**: `value`, `onChange`, `placeholder`, `className`
-
----
+| Component | Description |
+|-----------|-------------|
+| `CustomSelect` | Portal-based dropdown select |
+| `ColorPicker` | Color picker with presets and hue slider |
+| `CalendarPicker` | Full calendar date picker with month/year quick select |
 
 ### Layout
 
-#### Card
-
-```jsx
-import { Card, CardHeader, CardContent, CardFooter } from './ui-kit';
-
-<Card>
-  <CardHeader>Title</CardHeader>
-  <CardContent>Body content</CardContent>
-  <CardFooter>Footer actions</CardFooter>
-</Card>
-```
-
-#### Table
-
-```jsx
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from './ui-kit';
-
-<Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead>Name</TableHead>
-      <TableHead>Status</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    <TableRow>
-      <TableCell>Task 1</TableCell>
-      <TableCell><Badge status="completed">Done</Badge></TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
-```
-
-#### Tabs
-
-```jsx
-import { Tabs, Tab } from './ui-kit';
-
-<Tabs>
-  <Tab label="General" active />
-  <Tab label="Advanced" />
-  <Tab label="Danger Zone" />
-</Tabs>
-```
-
-#### Modal
-
-```jsx
-import { Modal, ModalFooter, Button } from './ui-kit';
-
-<Modal open={isOpen} onClose={() => setIsOpen(false)} title="Confirm" description="Are you sure?">
-  <p>Modal content here</p>
-  <ModalFooter>
-    <Button variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
-    <Button onClick={handleConfirm}>Confirm</Button>
-  </ModalFooter>
-</Modal>
-```
-
-**Props**: `open`, `onClose`, `title`, `description`, `size` (`sm` | `md` | `lg` | `xl`), `hideClose` (hides the X button), `children`
-
-#### ConfirmModal
-Pre-built confirmation dialog.
-
-```jsx
-import { ConfirmModal } from './ui-kit';
-
-<ConfirmModal
-  open={showConfirm}
-  onClose={() => setShowConfirm(false)}
-  onConfirm={handleDelete}
-  title="Delete Item"
-  message="This cannot be undone."
-  variant="danger"
-  confirmLabel="Delete"
-/>
-```
-
-**Props**: `open`, `onClose`, `onConfirm`, `title`, `message`, `variant` (`danger` | `warning` | `default`), `confirmLabel`, `cancelLabel`
-
-#### EmptyState
-
-```jsx
-import { EmptyState } from './ui-kit';
-import { Tray } from '@phosphor-icons/react';
-
-<EmptyState
-  icon={Tray}
-  title="No items"
-  description="Get started by creating your first item."
-  centered
-  action={<Button>Create</Button>}
-/>
-```
-
-**Props**: `icon`, `title`, `description`, `action`, `centered`, `className`
-
-#### AnimatedList
-Staggered animation wrapper for lists.
-
-```jsx
-import { AnimatedList, AnimatedItem } from './ui-kit';
-
-<AnimatedList>
-  {items.map(item => (
-    <AnimatedItem key={item.id}>
-      <div>{item.name}</div>
-    </AnimatedItem>
-  ))}
-</AnimatedList>
-```
-
----
+| Component | Description |
+|-----------|-------------|
+| `Card` | Card with header, content, footer slots |
+| `Table` | Data table with header, body, row, cell subcomponents |
+| `Tabs` | Tab navigation |
+| `Modal` | Dialog overlay with title, description, footer |
+| `ConfirmModal` | Pre-built confirmation dialog (danger/warning/default) |
+| `EmptyState` | Empty state with icon, title, description, action |
+| `AnimatedList` | Staggered animation wrapper for lists |
 
 ### Feedback
 
-#### ToastProvider
-Theme-aware toast notifications powered by Sonner.
+| Component | Description |
+|-----------|-------------|
+| `ToastProvider` | Theme-aware toast notifications (via Sonner) |
+| `Skeleton` | Skeleton loading placeholders for every page type |
+| `ConfirmSlider` | Slide-to-confirm interaction with knob and fill |
+| `NotificationPanel` | Notification dropdown with dismiss and clear all |
+| `ProfileMenu` | User profile dropdown with avatar and actions |
 
-```jsx
-import { ToastProvider } from './ui-kit';
-import { toast } from 'sonner';
+### Composites
 
-// In your app root:
-<ToastProvider />
-
-// Anywhere in your app:
-toast.success('Saved!');
-toast.error('Something went wrong');
-toast.info('New update available');
-toast('Neutral message');
-```
-
----
-
-### Skeleton Loaders
-
-Pre-built skeleton layouts for every page type:
-
-```jsx
-import {
-  DashboardSkeleton,
-  TaskListSkeleton,
-  TaskDetailSkeleton,
-  SessionListSkeleton,
-  AgentListSkeleton,
-  SettingsSkeleton,
-  ProjectsSkeleton,
-} from './ui-kit';
-
-// Use while loading:
-if (loading) return <DashboardSkeleton />;
-```
-
-Available skeletons: `Skeleton`, `DashboardSkeleton`, `TaskListSkeleton`, `TaskDetailSkeleton`, `SessionListSkeleton`, `SessionDetailSkeleton`, `AgentListSkeleton`, `ActivitySkeleton`, `ExpensesSkeleton`, `PeopleSkeleton`, `AlertsSkeleton`, `AISkeleton`, `KnowledgeSkeleton`, `SettingsSkeleton`, `GlobalSettingsSkeleton`, `ProjectsSkeleton`, `GlobalTasksSkeleton`, `DocumentationSkeleton`, `QueueSkeleton`
+| Component | Description |
+|-----------|-------------|
+| `SubtaskTimeline` | Collapsible subtask list with status indicators |
+| `ThemeGrid` | Visual theme selector grid |
+| `Graphic` | Decorative SVG graphic component |
 
 ---
 
-### Composite Components
+## SwiftGifts Components
 
-#### SubtaskTimeline
-Collapsible subtask list with status indicators.
+Components specific to the SwiftGifts Telegram Mini App ecosystem, located in `components/swift/`.
 
-```jsx
-import { SubtaskTimeline } from './ui-kit';
+### Charts and Analytics
 
-<SubtaskTimeline
-  subtasks={[
-    { id: '1', title: 'Setup database', status: 'completed', description: 'Install Postgres' },
-    { id: '2', title: 'Create API', status: 'in_progress' },
-    { id: '3', title: 'Write tests', status: 'pending' },
-  ]}
-  defaultOpen={true}
-/>
-```
+| Component | Description |
+|-----------|-------------|
+| `LineChart` | Pure SVG line chart with gradient fill, timeframe selector, hover tooltip. Used for market cap. |
+| `BarChart` | SVG bar chart with timeframe selector. Used for volume analytics. |
+| `WhaleFlowChart` | Scrollable vertical bar chart with opacity encoding volume. Legend, hover stats. |
+| `HealthScoreGauge` | 3/4 arc SVG gauge (red/yellow/green) with score center text. |
 
-**Statuses**: `pending`, `in_progress`, `code_complete`, `tests_passing`, `validated`, `completed`, `rework`, `failed`
+### Tables
 
-#### ThemeGrid
-Visual theme selector grid.
+| Component | Description |
+|-----------|-------------|
+| `SlidingTable` | Horizontally scrollable table with fixed rank+name columns, green/red change values. |
+| `TransactionTable` | Whale/transaction table with address, amount, buy/sell side coloring. |
+| `TransactionHistory` | Date-grouped history with image, title, tx ID, status badge. |
 
-```jsx
-import { ThemeGrid } from './ui-kit';
+### Heatmap
 
-<ThemeGrid
-  themes={allThemes}
-  activeId={currentThemeId}
-  onSelect={setTheme}
-  onDelete={deleteCustomTheme}
-/>
-```
+| Component | Description |
+|-----------|-------------|
+| `Heatmap` | Treemap-style heatmap. Blocks sized by change, colored green/red. Timeframe buttons. Click-to-detail panel below grid (Telegram-style). |
 
-#### ActivityFeed
-Event timeline for task/project activity.
+### Gift / Marketplace
 
----
+| Component | Description |
+|-----------|-------------|
+| `GiftCard` | Telegram gift card with provider icon, backdrop gradient, paper texture, squircle corners. Cart toggle. |
+| `ItemCard` | Simpler item card variant with provider badge, price, cart button. |
+| `OrderCard` | Order summary with fee breakdown, currency selector, buy/cart buttons. |
 
-### Navigation
+### Gamification
 
-#### Sidebar
-Responsive sidebar with icon-based navigation.
+| Component | Description |
+|-----------|-------------|
+| `AchievementCard` | Achievement tile with icon, title, subtitle. Completed vs locked states. Pin badge. |
+| `AchievementsModal` | Modal with tab switcher, grid of AchievementCards, empty state. |
+| `CheckInBonus` | 7-day check-in grid. Gem icon + reward per day, green check when claimed. |
+| `ReferralCard` | Earned stats (TON + gems), invited friends, badge with progress, invite/copy buttons. |
 
-#### TopBar
-Top navigation bar with search, notifications, profile menu, and connection status.
+### Profile / Status
 
----
+| Component | Description |
+|-----------|-------------|
+| `BatteryIndicator` | Battery icon with 4 states (none/low/half/full). |
+| `CurrencyBadge` | Small badge with currency icon (TON/USDT/STON/DUST/Web3/DaoLama) + value. |
+| `StatsTriplet` | Three stat blocks in a row (e.g., Earned / Volume / Orders). |
+| `DegenModeCard` | Subscription card with crosshair icon, active/inactive state, expiry. |
 
-## Global Styles
+### Layout / Controls
 
-The `styles/globals.css` file includes:
+| Component | Description |
+|-----------|-------------|
+| `TimeframeControl` | Row of timeframe buttons (1h/6h/1d etc.), single-select with accent highlight. |
+| `SegmentedControl` | Pill-style segmented tabs (Overview/Collections/Whales). |
+| `FilterDropdown` | Dropdown button for filter options (all/gainers/losers/volume). |
 
-- **Tailwind v4** theme configuration with all CSS variables
-- **Paper grain texture** overlay (subtle noise effect via SVG)
-- **Custom scrollbars** (thin, theme-aware)
-- **Focus ring removal** on all buttons
-- **Selection color** using accent
-- **Animation keyframes**: `fade-in`, `slide-in-from-top-2`, `slide-in-from-bottom-4`, `dropdown-in`, `skeleton-pulse`, `spin-once`
-- **Fonts**: Plus Jakarta Sans (sans), JetBrains Mono (mono)
+### Icons
+
+| Component | Description |
+|-----------|-------------|
+| `SwiftIcons` | Inline SVG icons: `TonIcon`, `GemIcon` (Phosphor SketchLogo), `PresentIcon`, `StarIcon`, `CrownIcon`, `WalletIcon`, `BatteryIcon`. |
 
 ---
 
@@ -568,10 +264,10 @@ The `styles/globals.css` file includes:
 
 ```
 ui-kit/
-  index.js              # Main entry point - all exports
-  README.md             # This file
-  COMPONENTS.md         # Detailed component API docs
-  components/           # Base UI primitives
+  index.js                # Main entry point - all exports
+  README.md               # This file
+  COMPONENTS.md           # Detailed component API docs
+  components/             # Base UI primitives
     Button.jsx
     Input.jsx
     Badge.jsx
@@ -580,39 +276,58 @@ ui-kit/
     CalendarPicker.jsx
     ColorPicker.jsx
     ConfirmModal.jsx
+    ConfirmSlider.jsx
     CustomSelect.jsx
     EmptyState.jsx
+    Graphic.jsx
     Loader.jsx
     Modal.jsx
-    PathInput.jsx
+    NotificationPanel.jsx
+    ProfileMenu.jsx
     ProgressBar.jsx
-    Sidebar.jsx
     Skeleton.jsx
     Table.jsx
     Tabs.jsx
     Toast.jsx
-    TopBar.jsx
     Tooltip.jsx
     AnimatedList.jsx
-    index.js
-  composites/           # Higher-level composed components
+    swift/                # SwiftGifts-specific components
+      LineChart.jsx
+      BarChart.jsx
+      WhaleFlowChart.jsx
+      HealthScoreGauge.jsx
+      SlidingTable.jsx
+      TransactionTable.jsx
+      TransactionHistory.jsx
+      Heatmap.jsx
+      GiftCard.jsx
+      ItemCard.jsx
+      OrderCard.jsx
+      AchievementCard.jsx
+      AchievementsModal.jsx
+      CheckInBonus.jsx
+      ReferralCard.jsx
+      BatteryIndicator.jsx
+      CurrencyBadge.jsx
+      StatsTriplet.jsx
+      DegenModeCard.jsx
+      TimeframeControl.jsx
+      SegmentedControl.jsx
+      FilterDropdown.jsx
+      SwiftIcons.jsx
+  composites/             # Higher-level composed components
     SubtaskTimeline.jsx
     ThemeGrid.jsx
-    WelcomeModal.jsx
-    ActivityFeed.jsx
-    ApprovalButton.jsx
-    GuidedTour.jsx
-    LiveOutputBar.jsx
-    GitHubImportModal.jsx
-    ProjectSidebar.jsx
-    CliStreamPanel.jsx
-  hooks/                # Utility hooks
+  hooks/                  # Utility hooks
     useSquircle.js
-  themes/               # Theme system
+  themes/                 # Theme system
     ThemeContext.jsx
-  styles/               # Global CSS
+  styles/                 # Global CSS
     globals.css
-  playground/           # Interactive component gallery (Vite app)
+  swift-assets/           # SwiftGifts image assets
+    img/                  # Gift images, marketplace logos, currency icons
+    icons/                # SVG icons, battery states
+  playground/             # Interactive component gallery (Vite app)
     package.json
     vite.config.js
     src/App.jsx
@@ -620,7 +335,7 @@ ui-kit/
 
 ## Playground
 
-The UI Kit includes an interactive playground app for previewing and testing all components:
+The UI Kit includes an interactive playground for previewing all components:
 
 ```bash
 cd ui-kit/playground
@@ -628,19 +343,17 @@ npm install
 npm run dev
 ```
 
-This starts a Vite dev server at `http://localhost:5173` with a full component gallery, live theme switching, and usage examples for every component.
+Starts a Vite dev server at `http://localhost:5173` with a full component gallery, live theme switching (8 themes), mobile-responsive layout with burger menu, and usage examples for every component.
 
 ---
 
 ## Design Philosophy
 
 - **Theme-first**: Every color references a CSS variable. No hardcoded colors.
-- **Portal-based popups**: All dropdowns, calendars, and pickers render via `createPortal` to avoid clipping inside modals or scroll containers.
-- **Accessible**: Keyboard navigation, ARIA attributes, focus management.
-- **Responsive**: Mobile-first with breakpoint-aware layouts.
+- **Dark-mode-first**: Designed for dark themes, fully supports light themes.
+- **Portal-based popups**: Dropdowns, calendars, and pickers render via `createPortal` to avoid clipping.
+- **Squircle corners**: Gift cards and marketplace components use iOS-style continuous corners.
+- **Paper textures**: SVG noise overlays on gift/item cards for tactile depth.
+- **Responsive**: Mobile-first with breakpoint-aware layouts. Mobile header with scroll-aware visibility.
 - **Performant**: CSS-only animations, no runtime animation libraries for base components.
-- **Consistent**: Unified border radii (`rounded-xl`, `rounded-2xl`), spacing, and typography scales.
-
-## License
-
-Part of the alexbot project. See root LICENSE for details.
+- **Consistent**: Unified border radii, spacing, and typography scales across all components.
