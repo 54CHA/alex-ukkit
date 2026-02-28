@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { clsx } from 'clsx';
 
 export function Input({
@@ -9,10 +10,13 @@ export function Input({
   clearable = false,
   onClear,
   endContent,
+  id,
   value,
   onChange,
   ...props
 }) {
+  const generatedId = useId();
+  const inputId = id || generatedId;
   const showClear = clearable && value && String(value).length > 0;
   const hasRight = showClear || endContent;
 
@@ -28,7 +32,7 @@ export function Input({
   return (
     <div className={clsx('space-y-1.5', wrapperClassName)}>
       {label && (
-        <label className="block text-xs font-medium text-text-secondary">
+        <label htmlFor={inputId} className="block text-xs font-medium text-text-secondary">
           {label}
         </label>
       )}
@@ -39,6 +43,7 @@ export function Input({
           </div>
         )}
         <input
+          id={inputId}
           value={value}
           onChange={onChange}
           className={clsx(

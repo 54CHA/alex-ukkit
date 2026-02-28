@@ -1,0 +1,18 @@
+# Deployment output
+dist/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

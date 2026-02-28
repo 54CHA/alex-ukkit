@@ -18,7 +18,7 @@ const TooltipBubble = forwardRef(function TooltipBubble({ children, className },
       ref={combinedRef}
       role="tooltip"
       className={clsx(
-        'absolute z-100 px-2.5 py-1.5 rounded-lg text-[11px] font-medium',
+        'absolute z-[10000] px-2.5 py-1.5 rounded-lg text-[11px] font-medium',
         'bg-surface-raised text-text-secondary border-0',
         'whitespace-normal max-w-60 pointer-events-none',
         'animate-in fade-in duration-100',

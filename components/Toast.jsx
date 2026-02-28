@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Toaster } from 'sonner';
 
 /**
@@ -6,16 +7,25 @@ import { Toaster } from 'sonner';
  * top-left corner, using the alert-type accent color as background.
  */
 export function ToastProvider() {
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 767px)').matches);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)');
+    const onChange = (event) => setIsMobile(event.matches);
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
+
   return (
     <>
       <Toaster
-        position="bottom-right"
+        position={isMobile ? 'top-center' : 'bottom-right'}
         theme="dark"
         richColors={false}
         closeButton
-        offset={16}
+        offset={isMobile ? 12 : 16}
         gap={8}
-        visibleToasts={4}
+        visibleToasts={isMobile ? 2 : 4}
         toastOptions={{
           style: {
             background: 'var(--color-surface-raised)',
