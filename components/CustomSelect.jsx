@@ -68,7 +68,7 @@ export function CustomSelect({
       <button
         type="button"
         onClick={() => setOpen(v => !v)}
-        className={`w-full flex items-center justify-between gap-2 ${sizeClasses} rounded-xl bg-surface-overlay/60 text-text-primary hover:bg-surface-overlay transition-colors focus:outline-none`}
+        className={`w-full flex items-center justify-between gap-2 ${sizeClasses} rounded-xl border-0 bg-surface-overlay/60 text-text-primary hover:bg-surface-overlay transition-colors focus:outline-none focus:ring-0`}
       >
         <span className={selected ? 'truncate' : 'text-text-muted truncate'}>
           {selected?.label || placeholder}
